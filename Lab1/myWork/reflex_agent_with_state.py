@@ -3,7 +3,7 @@ B = 'B'
 C = 'C'
 D = 'D'
 state = {}
-action = None
+last_action = None
 model = {A: None, B: None, C: None, D: None}  # Initially ignorant
 
 RULE_ACTION = {
@@ -59,7 +59,7 @@ def update_state(state, action, percept):
 
 
 def run_reflex_agent_with_state(percept):
-    global state, action
+    global state, last_action
     state = update_state(state, action, percept)
     rule = match_rule(state, rules)
     action = RULE_ACTION[rule]
