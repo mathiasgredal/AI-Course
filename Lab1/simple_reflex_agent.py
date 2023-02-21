@@ -12,7 +12,7 @@ rules = {
     (B, 'Dirty'): 1,
     (A, 'Clean'): 2,
     (B, 'Clean'): 3,
-    (A,B, 'Clean'): 4
+    (A, B, 'Clean'): 4
 }
 # Ex. rule (if location == A && Dirty then rule 1)
 

@@ -16,14 +16,14 @@ table = {
 }
 
 
-def LOOKUP(percepts, table):  # Lookup appropriate action for percepts
+def LOOKUP(percepts: list, table: dict):  # Lookup appropriate action for percepts
     action = table.get(tuple(percepts))
     # In Python 3.6 this does not work, but the following does
     # action = table.get((percepts,))
     return action
 
 
-def TABLE_DRIVEN_AGENT(percept):  # Determine action based on table and percepts
+def TABLE_DRIVEN_AGENT(percept: tuple):  # Determine action based on table and percepts
     percepts.append(percept)  # Add percept
     action = LOOKUP(percepts, table)  # Lookup appropriate action for percepts
     return action
