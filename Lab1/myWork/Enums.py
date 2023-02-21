@@ -16,6 +16,12 @@ class Action(Enum):
     NO_OP = auto()
 
 
+# The agent will clean in a clockwise pattern following:
+# --
+# A B
+# C D
+# --
+# Which makes a clockwise pattern of A B D C (A...)
 class Location(Enum):
     A = auto()
     B = auto()
