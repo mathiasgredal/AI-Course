@@ -2,7 +2,7 @@ from __future__ import annotations
 
 
 class Node:
-    def __init__(self, state: str, parent: Node = None, depth: int = 0):
+    def __init__(self, state, parent: Node = None, depth: int = 0):
         self.state = state
         self.parent_node = parent
         self.depth = depth
@@ -67,7 +67,7 @@ class StateSpace:
 
 
 class Searcher:
-    def __init__(self, initial_state='A', goal_state='J', state_space: StateSpace = None):
+    def __init__(self, initial_state, goal_state, state_space: StateSpace = None):
         self.initial_state = initial_state
         self.goal_state = goal_state
         self.state_space = state_space
@@ -109,6 +109,60 @@ if __name__ == '__main__':
         'J': [],
     }
 
-    searcher = Searcher(state_space=StateSpace(input_state_space))
+    searcher = Searcher('A', 'J', state_space=StateSpace(input_state_space))
+    print("Depth-first")
     searcher.run(depth_first=True)
+    print("Breadth-first")
+    searcher.run(depth_first=False)
+
+    vacuum_space = {
+        ('A', 'Dirty', 'Dirty'): [('A', 'Clean', 'Dirty'), ('A', 'Dirty', 'Dirty'), ('B', 'Dirty', 'Dirty')],
+        ('B', 'Dirty', 'Dirty'): [('B', 'Dirty', 'Clean'), ('A', 'Dirty', 'Dirty'), ('B', 'Dirty', 'Dirty')],
+        ('B', 'Dirty', 'Clean'): [('B', 'Dirty', 'Clean'), ('A', 'Dirty', 'Clean')],
+        ('A', 'Dirty', 'Clean'): [('B', 'Dirty', 'Clean'), ('A', 'Clean', 'Clean'), ('A', 'Dirty', 'Clean')],
+        ('A', 'Clean', 'Dirty'): [('B', 'Clean', 'Dirty'), ('A', 'Clean', 'Dirty')],
+        ('B', 'Clean', 'Dirty'): [('B', 'Clean', 'Dirty'), ('A', 'Clean', 'Dirty'), ('A', 'Clean', 'Clean')],
+        ('B', 'Clean', 'Clean'): [('B', 'Clean', 'Clean'), ('A', 'Clean', 'Clean')],
+        ('A', 'Clean', 'Clean'): [('B', 'Clean', 'Clean'), ('A', 'Clean', 'Clean')],
+    }
+
+    print("Vacuum world")
+    searcher = Searcher(initial_state=('A', 'Dirty', 'Dirty'), goal_state=('B', 'Clean', 'Clean'),
+                        state_space=StateSpace(vacuum_space))
+    print("Depth-first")
+    # searcher.run(depth_first=True)
+    print("Breadth-first")
+    searcher.run(depth_first=False)
+
+    # tuple_format = ("farmer", "wolf", "goat", "cabbage")  # W for west, E for East
+    farmer_space = {
+        ('W', 'W', 'W', 'W'): [('E', 'E', 'W', 'W'), ('E', 'W', 'E', 'W'), ('E', 'W', 'W', 'E')],
+        # depth 1
+        ('E', 'E', 'W', 'W'): [],  # done the goat ate the cabbage
+        ('E', 'W', 'E', 'W'): [('W', 'W', 'W', 'W'), ('W', 'W', 'E', 'W')],
+        ('E', 'W', 'W', 'E'): [],  # Done the wolf ate the goat
+        # All results from depth 1 explored
+        # Depth 2
+        ('W', 'W', 'E', 'W'): [('E', 'W', 'E', 'W'), ('E', 'E', 'E', 'W'), ('E', 'W', 'E', 'E')],
+        # Depth 3
+        ('E', 'E', 'E', 'W'): [('W', 'E', 'W', 'W'), ('W', 'E', 'E', 'W'), ('W', 'W', 'E', 'W')],
+        ('E', 'W', 'E', 'E'): [('W', 'W', 'E', 'E'), ('W', 'W', 'E', 'W'), ('W', 'W', 'W', 'E')],
+        # Depth 4
+        ('W', 'E', 'W', 'W'): [('E', 'E', 'W', 'W'), ('E', 'E', 'E', 'W'), ('E', 'E', 'W', 'E')],
+        ('W', 'E', 'E', 'W'): [],  # Done the wolf ate the goat
+        ('W', 'W', 'E', 'W'): [('E', 'W', 'E', 'W'), ('E', 'E', 'E', 'W'), ('E', 'W', 'E', 'E')],
+        ('W', 'W', 'E', 'E'): [],  # Done the goat ate the cabbage
+        ('W', 'W', 'W', 'E'): [('E', 'W', 'W', 'E'), ('E', 'E', 'W', 'E'), ('E', 'W', 'E', 'E')],
+        # Depth 5
+        ('E', 'E', 'W', 'E'): [('W', 'E', 'W', 'E'), ('W', 'W', 'W', 'E'), ('W', 'E', 'W', 'W')],
+        # Depth 6
+        ('W', 'E', 'W', 'E'): [('E', 'E', 'W', 'E'), ('E', 'E', 'E', 'E')],
+    }
+
+    print("Farmer world")
+    searcher = Searcher(initial_state=('W', 'W', 'W', 'W'), goal_state=('E', 'E', 'E', 'E'),
+                        state_space=StateSpace(farmer_space))
+    print("Depth-first")
+    # searcher.run(depth_first=True)
+    print("Breadth-first")
     searcher.run(depth_first=False)
