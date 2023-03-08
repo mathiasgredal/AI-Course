@@ -55,7 +55,7 @@ class SearchState:
         return self.environment.count_dirty_states()
 
     def get_heuristic(self):
-        extra = 1 if self.environment.environment[self.position] == StateTypes.DIRTY else 0
+        extra = 0.5 if self.environment.environment[self.position] == StateTypes.CLEAN else 0
         return self.environment.count_dirty_states() + extra
 
     def insert(self, queue: list[SearchState], alpha: float = 1) -> list[SearchState]:
