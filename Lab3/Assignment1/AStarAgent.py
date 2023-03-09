@@ -31,30 +31,34 @@ class AStarAgent:
         self.goal_state = EnvironmentState({
             Location.A: StateTypes.CLEAN,
             Location.B: StateTypes.CLEAN,
-            Location.C: StateTypes.CLEAN,
-            Location.D: StateTypes.CLEAN,
+            Location.C: StateTypes.UNKNOWN,
+            Location.D: StateTypes.UNKNOWN,
         })
 
         self.state = EnvironmentState(start_state_space)
 
-    def weighted_A_star(self, weight_alpha: float = 1) -> list[Action]:
+    def weighted_A_star(self, weight_alpha: float = 1) -> tuple[list[Action], int, int]:
+        """
+        Returns a tuple containing:
+        (List of actions, cost of the path, number of explored nodes)
+        """
         fringe = []
 
         initial_state = SearchState(self.state, self.current_position)
         fringe = initial_state.insert(fringe, weight_alpha)
 
-        fringe_count = 0
+        explored_node_count = 0
 
         while fringe is not None:
             node = remove_first(fringe)
             if node.get_environment_state() == self.goal_state:
-                return node.path
+                return node.path, len(node.path), explored_node_count
             children = self.expand_node(node, weight_alpha)
             fringe = insert_all(children, fringe, weight_alpha)
-            fringe_count += 1
-            print(f"Fringe {fringe_count}: {fringe}")
+            explored_node_count += 1
+            print(f"Fringe {explored_node_count} (length: {len(fringe)}): {fringe}")
 
-        return []
+        return [], -1, explored_node_count
 
     def expand_node(self, node: SearchState, alpha: float) -> list[SearchState]:
         # Check the legal moves on the current position of the agent
@@ -77,21 +81,20 @@ class AStarAgent:
                 environment.clean(node.position)
             path = node.path.copy()
             path.append(action)
-            new_state = SearchState(environment=environment, position=new_location, path=path, cost=node.cost+1)
+            new_state = SearchState(environment=environment, position=new_location, path=path, cost=node.cost + 1)
             out.append(new_state)
 
         return out
 
 
-def run(n):  # run the agent through n steps
-    print('    Current                        New')
-    print('location    status  action  location    status')
+def run(alpha=1.5):
     environment = test_environment.copy()
     agent = AStarAgent(Location.A, environment)
-    solution = agent.weighted_A_star()
-    print(solution)
-
+    solution = agent.weighted_A_star(alpha)
+    print(f"\nPath: {solution[0]} - Cost of path: {solution[1]} - Number of nodes explored: {solution[2]}")
 
 
 if __name__ == '__main__':
-    run(20)
+    for alpha in [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9]:
+        print(f"Running A-star with alpha: {alpha}")
+        run(alpha)

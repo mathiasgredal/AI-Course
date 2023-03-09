@@ -41,8 +41,10 @@ class Location(Enum):
         always_allowed = (Action.NO_OP,)
         if self == Location.A:
             return Action.DOWN, Action.RIGHT, *always_allowed
+            # return Action.RIGHT, *always_allowed
         if self == Location.B:
             return Action.DOWN, Action.LEFT, *always_allowed
+            # return Action.LEFT, *always_allowed
         if self == Location.C:
             return Action.UP, Action.RIGHT, *always_allowed
         if self == Location.D:

@@ -21,7 +21,12 @@ class EnvironmentState:
             return False
 
         for k, v in self.environment.items():
-            if other.environment[k] != v:
+            other_val = other.environment[k]
+
+            if other_val == StateTypes.UNKNOWN or v == StateTypes.UNKNOWN:
+                continue
+
+            if other_val != v:
                 return False
 
         return True  # The other thing is an EnvironmentState,
@@ -33,6 +38,8 @@ class EnvironmentState:
         return EnvironmentState(out_state)
 
     def clean(self, location: Location) -> None:
+        if location not in self.environment:
+            raise Exception(f"This location ({location}) does not exist")
         self.environment[location] = StateTypes.CLEAN
 
     def __repr__(self):
