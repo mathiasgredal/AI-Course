@@ -31,8 +31,8 @@ class AStarAgent:
         self.goal_state = EnvironmentState({
             Location.A: StateTypes.CLEAN,
             Location.B: StateTypes.CLEAN,
-            Location.C: StateTypes.UNKNOWN,
-            Location.D: StateTypes.UNKNOWN,
+            Location.C: StateTypes.CLEAN,
+            Location.D: StateTypes.CLEAN,
         })
 
         self.state = EnvironmentState(start_state_space)
@@ -95,6 +95,7 @@ def run(alpha=1.5):
 
 
 if __name__ == '__main__':
-    for alpha in [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9]:
+    for alpha in [1, 1.1]:
+    # for alpha in [1, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9]:
         print(f"Running A-star with alpha: {alpha}")
         run(alpha)

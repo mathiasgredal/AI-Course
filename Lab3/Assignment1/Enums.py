@@ -82,7 +82,7 @@ _up = {
 
 _down = {
     Location.A: Location.C,
-    Location.B: Location.B,
+    Location.B: Location.D,
     Location.C: Location.UNKNOWN,
     Location.D: Location.UNKNOWN
 }
