@@ -18,17 +18,19 @@ def fitness_fn_negative(individual):
 
         for other_column in range(column + 1, n):
             # Horizontal
-            if individual[other_column] == row:
-                contribution += 1
-                continue
+            # (to the right of me, diagonal above, diagonal below)
+            # collisions = (row, row + (column - other_column), row - (column - other_column))
+            # if individual[other_column] in collisions:
+            #     contribution += 1
 
-            # Diagonals
-            row_a = row + (column - other_column)
-            row_b = row - (column - other_column)
-            if 0 <= row_a < n and individual[other_column] == row_a:
-                contribution += 1
-                continue
-            if 0 <= row_b < n and individual[other_column] == row_b:
+            # if individual[other_column] == row:
+            #     contribution += 1
+            #     # continue
+
+            # # Diagonals
+            dx = abs(column - other_column)
+            dy = abs(row - individual[other_column])
+            if dx == dy or dy == 0:
                 contribution += 1
 
         fitness += contribution

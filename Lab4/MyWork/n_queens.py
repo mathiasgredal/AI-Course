@@ -1,20 +1,20 @@
 import random
+import time
 
 from Lab4.queens_fitness import fitness_fn_negative
 
-p_mutation = 0.4
-p_value_mutation = 0.4
-num_of_generations = 1000
+p_mutation = 0.5
+p_value_mutation = 0.5
+num_of_generations = 100
+population_size = 100
 
 
 # noinspection DuplicatedCode
-def genetic_algorithm(population: set[tuple], fitness_fn, minimal_fitness: float) -> tuple:
+def genetic_algorithm(population: set[tuple], fitness_fn, minimal_fitness: float) -> tuple[tuple, set[tuple]]:
     generation = ()
     fittest_individual = ()
     for generation in range(num_of_generations):
-        print(f"Generation {generation}:")
-        if generation >= num_of_generations / 10 * 9:
-            print_population(population, fitness_fn)
+        # print(f"Generation {generation}:")
 
         new_population = set()
 
@@ -30,7 +30,7 @@ def genetic_algorithm(population: set[tuple], fitness_fn, minimal_fitness: float
         # Add new population to population, use union to disregard
         # duplicate individuals
         population = population.union(new_population)
-        population = trim_population(population, 50, fitness_fn_negative)
+        population = trim_population(population, population_size, fitness_fn_negative)
 
         fittest_individual = get_fittest_individual(population, fitness_fn)
 
@@ -40,7 +40,7 @@ def genetic_algorithm(population: set[tuple], fitness_fn, minimal_fitness: float
     print(f"Final generation {generation}:")
     print_population(population, fitness_fn)
 
-    return fittest_individual
+    return fittest_individual, population
 
 
 def trim_population(population: set[tuple], desired_length: int, fitness_fn) -> set[tuple]:
@@ -74,7 +74,7 @@ def reproduce(mother: tuple, father: tuple) -> tuple:
     Return the child individual
     '''
 
-    crossover_index = random.randint(2, len(mother) - 1)
+    crossover_index = random.randint(1, len(mother) - 1)
 
     child = (*mother[:crossover_index], *father[crossover_index:])
     # child = mother[:crossover_index] + father[crossover_index:]
@@ -88,7 +88,7 @@ def mutate(individual: tuple) -> tuple:
     Return the mutated individual
     '''
     mutation = individual
-    index = random.randint(0, len(individual) - 1)
+    # index = random.randint(0, len(individual) - 1)
     for i, val in enumerate(individual):
         if random.random() <= p_value_mutation:
             mutation = (*individual[:i], random.randint(1, 8), *individual[i + 1:])
@@ -146,13 +146,6 @@ def random_selection(population: set[tuple], fitness_fn) -> tuple[tuple, tuple]:
     return mother, father
 
 
-def fitness_function(individual: tuple) -> float:
-    '''
-    '''
-
-    return fitness_fn_negative(individual)
-
-
 def get_fittest_individual(iterable: set[tuple], func) -> tuple:
     return max(iterable, key=func)
 
@@ -179,12 +172,19 @@ def main():
         (2, 2, 2, 2, 2, 2, 2, 2),
         (3, 3, 3, 3, 3, 3, 3, 3),
         (3, 2, 7, 1, 3, 8, 2, 5),
-        (2, 2, 7, 1, 3, 8, 8, 5)
+        (2, 2, 7, 1, 3, 8, 8, 5),
+        (2, 2, 7, 1, 3, 8, 8, 5),
+        (2, 4, 7, 1, 3, 6, 8, 5),
+        (2, 4, 7, 1, 3, 8, 6, 8)
     }
     # initial_population = get_initial_population(3, 4)
 
-    fittest = genetic_algorithm(initial_population, fitness_function, minimal_fitness)
+    start_time = time.perf_counter_ns()
+    fittest, final_generation = genetic_algorithm(initial_population, fitness_fn_negative, minimal_fitness)
+    end_time = time.perf_counter_ns()
+    print_population(final_generation, fitness_fn_negative)
     print(f"Fittest Individual: {fittest} - fitness: {fitness_fn_negative(fittest)}")
+    print(f"total elapsed time: {(end_time - start_time) / 10**6} ms")
 
 
 if __name__ == '__main__':
