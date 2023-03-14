@@ -16,17 +16,18 @@ def fitness_fn_negative(individual):
     for column, row in enumerate(individual):
         contribution = 0
 
-        # Horizontal
         for other_column in range(column + 1, n):
+            # Horizontal
             if individual[other_column] == row:
                 contribution += 1
+                continue
 
-        # Diagonals
-        for other_column in range(column + 1, n):
+            # Diagonals
             row_a = row + (column - other_column)
             row_b = row - (column - other_column)
             if 0 <= row_a < n and individual[other_column] == row_a:
                 contribution += 1
+                continue
             if 0 <= row_b < n and individual[other_column] == row_b:
                 contribution += 1
 

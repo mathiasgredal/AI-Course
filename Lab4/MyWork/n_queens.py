@@ -3,7 +3,8 @@ import random
 from Lab4.queens_fitness import fitness_fn_negative
 
 p_mutation = 0.4
-num_of_generations = 300
+p_value_mutation = 0.4
+num_of_generations = 1000
 
 
 # noinspection DuplicatedCode
@@ -29,6 +30,7 @@ def genetic_algorithm(population: set[tuple], fitness_fn, minimal_fitness: float
         # Add new population to population, use union to disregard
         # duplicate individuals
         population = population.union(new_population)
+        population = trim_population(population, 50, fitness_fn_negative)
 
         fittest_individual = get_fittest_individual(population, fitness_fn)
 
@@ -46,13 +48,18 @@ def trim_population(population: set[tuple], desired_length: int, fitness_fn) -> 
     if trim_amount <= 0:
         return population
 
-    lowest_fitness = []
     # Will store tuples like (citizen: tuple, fitness: float)
+    population_list = sorted(list(population), key=lambda x: fitness_fn(x), reverse=False)
+    population_list = population_list[trim_amount:]
 
-    lowest_fitness = sorted(population[:trim_amount], key=lambda x: fitness_fn(x), reverse=False)
+    return set(population_list)
 
-    # for citizen in population:
-    #     if
+    # lowest_fitness = sorted(population_list[:trim_amount], key=lambda x: fitness_fn(x), reverse=False)
+    # lowest_fitness = [(x, fitness_fn(x)) for x in lowest_fitness]
+    # for citizen in population_list[trim_amount:]:
+    #     fitness = fitness_fn(citizen)
+    #     for other in lowest_fitness:
+    #         if
 
 
 def print_population(population: set[tuple], fitness_fn) -> None:
@@ -67,7 +74,7 @@ def reproduce(mother: tuple, father: tuple) -> tuple:
     Return the child individual
     '''
 
-    crossover_index = random.randint(1, len(mother) - 1)
+    crossover_index = random.randint(2, len(mother) - 1)
 
     child = (*mother[:crossover_index], *father[crossover_index:])
     # child = mother[:crossover_index] + father[crossover_index:]
@@ -80,11 +87,13 @@ def mutate(individual: tuple) -> tuple:
     Mutate an individual by randomly assigning one of its bits
     Return the mutated individual
     '''
-
+    mutation = individual
     index = random.randint(0, len(individual) - 1)
+    for i, val in enumerate(individual):
+        if random.random() <= p_value_mutation:
+            mutation = (*individual[:i], random.randint(1, 8), *individual[i + 1:])
 
     # mutation = individual[:index] + tuple([random.randint(1, 8)]) + individual[index + 1:]
-    mutation = (*individual[:index], random.randint(1, 8), *individual[index + 1:])
     return mutation
 
 
@@ -161,7 +170,7 @@ def get_initial_population(n: int, count: int) -> set[tuple]:
 
 
 def main():
-    minimal_fitness = -1
+    minimal_fitness = 0
 
     # Curly brackets also creates a set, if there isn't a colon to indicate a dictionary
     initial_population = {
@@ -169,11 +178,13 @@ def main():
         (1, 1, 1, 1, 1, 1, 1, 1),
         (2, 2, 2, 2, 2, 2, 2, 2),
         (3, 3, 3, 3, 3, 3, 3, 3),
+        (3, 2, 7, 1, 3, 8, 2, 5),
+        (2, 2, 7, 1, 3, 8, 8, 5)
     }
     # initial_population = get_initial_population(3, 4)
 
     fittest = genetic_algorithm(initial_population, fitness_function, minimal_fitness)
-    print('Fittest Individual: ' + str(fittest))
+    print(f"Fittest Individual: {fittest} - fitness: {fitness_fn_negative(fittest)}")
 
 
 if __name__ == '__main__':
