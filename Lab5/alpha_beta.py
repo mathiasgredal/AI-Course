@@ -1,3 +1,6 @@
+# This is based on the game Nim, where each player must in turn select a pile to split.
+# The result of the split must be 2 piles of different sizes
+
 def alpha_beta_decision(state):
     infinity = float('inf')
 

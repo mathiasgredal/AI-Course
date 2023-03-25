@@ -9,7 +9,7 @@ def minmax_decision(state):
         v = -infinity
         for (a, s) in successors_of(state):
             v = max(v, min_value(s))
-        print('V: ' + str(v))
+        # print('V: ' + str(v))
         return v
 
     def min_value(state):
@@ -59,7 +59,7 @@ def is_terminal(state) -> bool:
     return False
 
 
-def utility_of(state) -> int:
+def utility_of(state: list[int | str]) -> int:
     """
     returns +1 if winner is X (MAX player), -1 if winner is O (MIN player), or 0 otherwise
     :param state: State of the checkerboard. Ex: [0; 1; 2; 3; X; 5; 6; 7; 8]
@@ -69,27 +69,27 @@ def utility_of(state) -> int:
     utility = 0
 
     # Check diagonal
-    utility += check_lines(state, (0, 4, 8))
-    utility += check_lines(state, (2, 4, 6))
+    utility += check_line(state, (0, 4, 8))
+    utility += check_line(state, (2, 4, 6))
 
     # Check vertical
     for j in range(0, 3):  # up to and including 2
-        utility += check_lines(state, (j, j + 3, j + 6))
+        utility += check_line(state, (j, j + 3, j + 6))
 
     # Check horizontal
     for j in range(0, 7, 3):  # up to and including 6
-        utility += check_lines(state, (j, j + 1, j + 2))
+        utility += check_line(state, (j, j + 1, j + 2))
 
-    if utility > 0:
-        return 1
-
-    if utility <0:
-        return -1
+    # if utility > 0:
+    #     return 1
+    #
+    # if utility < 0:
+    #     return -1
 
     return utility
 
 
-def check_lines(state: list[str | int], numbers: tuple) -> int:
+def check_line(state: list[str | int], numbers: tuple) -> int:
     symbol_count = 0
     x_count = 0
     # o_count = symbol_count - x_count
