@@ -1,7 +1,7 @@
 from random import shuffle
 
-from Lab6.MyWork.Colors import Color
-from Lab6.MyWork.States import States
+from Lab6.Assignment2_part1.Colors import Color
+from Lab6.Assignment2_part1.States import States
 
 
 class CSP:

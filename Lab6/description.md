@@ -1,4 +1,11 @@
-# What did I do?
+# My structure
+
+I Have delivered the two versions of this code that was produced during the lab.
+
+In the folder `Assignment2_part1`, is the code for the Australia problem, and in `Assignment2_part2` is the code for the
+South America problem.
+
+# What work did I do?
 
 I made a few improvements on the template, before starting the work on the Assignment.
 
@@ -42,4 +49,9 @@ neighbours in, I did so in a clockwise order starting from the top.
 Following these changes the solution was correctly coloring the map, but to make it easier to check I added another
 print statement in the output loop, which shows the neighbours of each state and their colors. Feel free to use it if
 you check my solution, the countries are printed in the order described above, and the neighbours are printed roughly in
-that order as well :) 
+that order as well :)
+
+# GitHub Repo
+
+The code can also be found in my GitHub repo [https://github.com/thor2304/AI-Course](https://github.com/thor2304/AI-Course/blob/c237b7710f8bbbaeafbc3d9c4625aa2e59c1cece/Lab6).
+The delivered materials, can be found in the folder: `Lab6`.
