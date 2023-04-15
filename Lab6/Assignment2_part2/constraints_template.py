@@ -1,21 +1,19 @@
-from random import shuffle
-
-from Lab6.MyWork.Colors import Color
-from Lab6.MyWork.States import States
+from Lab6.Assignment2_part2.Colors import Color
+from Lab6.Assignment2_part2.SAStates import SAStates
 
 
 class CSP:
-    def __init__(self, variables: list[States], domains: dict[States, list[Color]],
-                 neighbours: dict[States, list[States]], constraints: dict[States, callable]):
+    def __init__(self, variables: list[SAStates], domains: dict[SAStates, list[Color]],
+                 neighbours: dict[SAStates, list[SAStates]], constraints: dict[SAStates, callable]):
         self.variables = variables
         self.domains = domains
         self.neighbours = neighbours
         self.constraints = constraints
 
-    def backtracking_search(self) -> dict[States, Color] | None:
+    def backtracking_search(self) -> dict[SAStates, Color] | None:
         return self.recursive_backtracking({})
 
-    def recursive_backtracking(self, assignment: dict[States, Color]) -> dict[States, Color] | None:
+    def recursive_backtracking(self, assignment: dict[SAStates, Color]) -> dict[SAStates, Color] | None:
         if self.is_complete(assignment):
             return assignment
 
@@ -33,7 +31,7 @@ class CSP:
 
         return None
 
-    def select_unassigned_variable(self, assignment: dict[States, Color]) -> States:
+    def select_unassigned_variable(self, assignment: dict[SAStates, Color]) -> SAStates:
         for variable in self.variables:
             if variable not in assignment:
                 return variable
@@ -44,12 +42,12 @@ class CSP:
                 return False
         return True
 
-    def order_domain_values(self, variable: States, assignment: dict[States, Color]) -> list[Color]:
+    def order_domain_values(self, variable: SAStates, assignment: dict[SAStates, Color]) -> list[Color]:
         all_values = self.domains[variable][:]
         # shuffle(all_values)
         return all_values
 
-    def is_consistent(self, variable: States, value: Color, assignment: dict[States, Color]) -> bool:
+    def is_consistent(self, variable: SAStates, value: Color, assignment: dict[SAStates, Color]) -> bool:
         if not assignment:
             return True
 
@@ -64,48 +62,57 @@ class CSP:
         return True
 
 
-def create_australia_csp() -> CSP:
-    variables = [States.WA, States.Q, States.T, States.V, States.SA, States.NT, States.NSW]
-    values = [Color.Red, Color.Blue, Color.Green]
+def create_south_america_csp() -> CSP:
+    variables = [v for v in SAStates]
+
+    # We write the colors individually, since it allows us greater control, to choose exactly the colors we want to use
+    values = [Color.Red, Color.Blue, Color.Green, Color.Yellow]
+
     domains = {
-        States.WA: values[:],
-        States.Q: values[:],
-        States.T: values[:],
-        States.V: values[:],
-        States.SA: values[:],
-        States.NT: values[:],
-        States.NSW: values[:],
     }
+    # All variables have the same domain, when starting
+    for variable in variables:
+        domains[variable] = values[:]
+
     neighbours = {
-        States.WA: [States.SA, States.NT],
-        States.Q: [States.SA, States.NT, States.NSW],
-        States.T: [],
-        States.V: [States.SA, States.NSW],
-        States.SA: [States.WA, States.NT, States.Q, States.NSW, States.V],
-        States.NT: [States.SA, States.WA, States.Q],
-        States.NSW: [States.SA, States.Q, States.V],
+        SAStates.CostaRica: [SAStates.Panama],
+        SAStates.Panama: [SAStates.CostaRica, SAStates.Colombia],
+        SAStates.Colombia: [SAStates.Panama, SAStates.Venezuela, SAStates.Ecuador, SAStates.Peru, SAStates.Brasil],
+        SAStates.Venezuela: [SAStates.Colombia, SAStates.Brasil, SAStates.Guyana],
+        SAStates.Guyana: [SAStates.Venezuela, SAStates.Brasil, SAStates.Suriname],
+        SAStates.Suriname: [SAStates.Guyana, SAStates.Brasil, SAStates.GuyaneFR],
+        SAStates.GuyaneFR: [SAStates.Suriname, SAStates.Brasil],
+        SAStates.Ecuador: [SAStates.Colombia, SAStates.Peru],
+        SAStates.Peru: [SAStates.Ecuador, SAStates.Colombia, SAStates.Brasil, SAStates.Bolivia, SAStates.Chile],
+        SAStates.Brasil: [SAStates.Colombia, SAStates.Venezuela, SAStates.Guyana, SAStates.Suriname, SAStates.GuyaneFR,
+                          SAStates.Uruguay, SAStates.Argentina, SAStates.Paraguay, SAStates.Bolivia, SAStates.Peru],
+        SAStates.Bolivia: [SAStates.Peru, SAStates.Brasil, SAStates.Paraguay, SAStates.Argentina, SAStates.Chile],
+        SAStates.Paraguay: [SAStates.Bolivia, SAStates.Brasil, SAStates.Argentina],
+        SAStates.Chile: [SAStates.Peru, SAStates.Bolivia, SAStates.Argentina],
+        SAStates.Argentina: [SAStates.Bolivia, SAStates.Paraguay, SAStates.Brasil, SAStates.Uruguay, SAStates.Chile],
+        SAStates.Uruguay: [SAStates.Brasil, SAStates.Argentina],
     }
 
-    def constraint_function(first_variable: States, first_value: Color, second_variable: States, second_value: Color):
+    def constraint_function(first_variable: SAStates, first_value: Color, second_variable: SAStates,
+                            second_value: Color):
         return first_value != second_value or first_variable == second_variable
 
     constraints = {
-        States.WA: constraint_function,
-        States.Q: constraint_function,
-        States.T: constraint_function,
-        States.V: constraint_function,
-        States.SA: constraint_function,
-        States.NT: constraint_function,
-        States.NSW: constraint_function,
     }
+    # Fill the constraint into all variables
+    for v in variables:
+        constraints[v] = constraint_function
 
     return CSP(variables, domains, neighbours, constraints)
 
 
 if __name__ == '__main__':
-    australia = create_australia_csp()
+    australia = create_south_america_csp()
     result = australia.backtracking_search()
     for area, color in sorted(result.items()):
         print("{}: {}".format(area, color))
+        # The below line makes it easier to check if any neighbours have been put into the solution wrongly
+        # And whether any color assignments violate constraints
+        print(f"\tNeighbours: {[(n.name, result[n].name) for n in australia.neighbours[area]]}")
 
     # Check at https://mapchart.net/australia.html
