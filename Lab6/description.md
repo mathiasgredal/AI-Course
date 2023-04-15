@@ -53,5 +53,5 @@ that order as well :)
 
 # GitHub Repo
 
-The code can also be found in my GitHub repo [https://github.com/thor2304/AI-Course](https://github.com/thor2304/AI-Course/blob/c237b7710f8bbbaeafbc3d9c4625aa2e59c1cece/Lab6).
+The code can also be found in my GitHub repo [https://github.com/thor2304/AI-Course](https://github.com/thor2304/AI-Course/tree/master/Lab6).
 The delivered materials, can be found in the folder: `Lab6`.
