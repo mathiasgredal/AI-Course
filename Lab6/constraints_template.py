@@ -1,8 +1,12 @@
 from random import shuffle
 
+from Lab6.MyWork.Colors import Color
+from Lab6.MyWork.States import States
+
 
 class CSP:
-    def __init__(self, variables, domains, neighbours, constraints):
+    def __init__(self, variables: list[States], domains: dict[States, list[Color]],
+                 neighbours: dict[States, list[States]], constraints: dict[States, callable]):
         self.variables = variables
         self.domains = domains
         self.neighbours = neighbours
@@ -14,23 +18,23 @@ class CSP:
     def recursive_backtracking(self, assignment):
         pass
 
-    def select_unassigned_variable(self, assignment):
+    def select_unassigned_variable(self, assignment) -> States:
         for variable in self.variables:
             if variable not in assignment:
                 return variable
 
-    def is_complete(self, assignment):
+    def is_complete(self, assignment) -> bool:
         for variable in self.variables:
             if variable not in assignment:
                 return False
         return True
 
-    def order_domain_values(self, variable, assignment):
+    def order_domain_values(self, variable: States, assignment) -> list[Color]:
         all_values = self.domains[variable][:]
         # shuffle(all_values)
         return all_values
 
-    def is_consistent(self, variable, value, assignment):
+    def is_consistent(self, variable: States, value: Color, assignment) -> bool:
         if not assignment:
             return True
 
@@ -45,40 +49,39 @@ class CSP:
         return True
 
 
-def create_australia_csp():
-    wa, q, t, v, sa, nt, nsw = 'WA', 'Q', 'T', 'V', 'SA', 'NT', 'NSW'
-    values = ['Red', 'Green', 'Blue']
-    variables = [wa, q, t, v, sa, nt, nsw]
+def create_australia_csp() -> CSP:
+    variables = [States.WA, States.Q, States.T, States.V, States.SA, States.NT, States.NSW]
+    values = [Color.Red, Color.Blue, Color.Green]
     domains = {
-        wa: values[:],
-        q: values[:],
-        t: values[:],
-        v: values[:],
-        sa: values[:],
-        nt: values[:],
-        nsw: values[:],
+        States.WA: values[:],
+        States.Q: values[:],
+        States.T: values[:],
+        States.V: values[:],
+        States.SA: values[:],
+        States.NT: values[:],
+        States.NSW: values[:],
     }
     neighbours = {
-        wa: [sa, nt],
-        q: [sa, nt, nsw],
-        t: [],
-        v: [sa, nsw],
-        sa: [wa, nt, q, nsw, v],
-        nt: [sa, wa, q],
-        nsw: [sa, q, v],
+        States.WA: [States.SA, States.NT],
+        States.Q: [States.SA, States.NT, States.NSW],
+        States.T: [],
+        States.V: [States.SA, States.NSW],
+        States.SA: [States.WA, States.NT, States.Q, States.NSW, States.V],
+        States.NT: [States.SA, States.WA, States.Q],
+        States.NSW: [States.SA, States.Q, States.V],
     }
 
     def constraint_function(first_variable, first_value, second_variable, second_value):
         return first_value != second_value
 
     constraints = {
-        wa: constraint_function,
-        q: constraint_function,
-        t: constraint_function,
-        v: constraint_function,
-        sa: constraint_function,
-        nt: constraint_function,
-        nsw: constraint_function,
+        States.WA: constraint_function,
+        States.Q: constraint_function,
+        States.T: constraint_function,
+        States.V: constraint_function,
+        States.SA: constraint_function,
+        States.NT: constraint_function,
+        States.NSW: constraint_function,
     }
 
     return CSP(variables, domains, neighbours, constraints)
