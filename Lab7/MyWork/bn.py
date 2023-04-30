@@ -3,7 +3,7 @@ from __future__ import annotations
 import functools
 import random
 from pprint import pformat
-from typing import Dict
+
 
 
 def multiply_vector_elements(vector):
@@ -63,6 +63,8 @@ class Variable(object):
         # indicates whether this node is ready to use
         # true when the marginal probabilities were calculated
         self.ready: bool = False
+
+        self.calculate_marginal_probability()
 
     def get_name(self) -> str:
         """ return the name of this random variable """
@@ -127,8 +129,17 @@ class Variable(object):
         if self.ready:
             return
 
-        # COMPLETE THIS FUNCTION
+        # TODO: COMPLETE THIS FUNCTION
         # Set self.marginal_probabilities
+
+        loops = 0
+        for parent_combinations, val in self.probability_table.items():
+            loops += 1
+            for i, prob in enumerate(val):
+                self.marginal_probabilities[i] += prob
+
+        for i, _ in enumerate(self.marginal_probabilities):
+            self.marginal_probabilities[i] /= loops
 
         # set this Node`s state to ready
         self.ready = True
@@ -144,6 +155,10 @@ class Variable(object):
     def add_parent(self, node):
         """ add a parent to this Variable """
         self.parents.append(node)
+
+    def get_parents(self):
+        """ returns the parent list """
+        return self.parents
 
     def get_children(self):
         """ returns the children list """
@@ -217,10 +232,33 @@ class BayesianNetwork(object):
     # values is dictionary
     def get_joint_probability(self, values: dict[str, str]) -> float:
         """ return the joint probability of the Nodes """
-        pass
-        # TODO: COMPLETE THIS FUNCTION
+
+        if not self.ready:
+            self.calculate_marginal_probabilities()
+
+        prob_out: float = 1
+        # Initialized to 1 allows us to *= in all iterations in the loop below since 1 * a = a
+        # therefore the first loop still gives correct result
+
+        for variable_string, value in values.items():
+            variable = self.varsMap[variable_string]
+
+            # Get parents values as dict[variable_name, Variable value]
+            # These will be the evidents
+            cond_evidents = {}
+            for parent in variable.get_parents():
+                if parent.name in values.keys():
+                    cond_evidents[parent.name] = values[parent.name]
+                else:
+                    raise KeyError(f"{parent.name} is not present in values.keys: {values.keys()}")
+
+            cond_input_values = {variable_string: value}
+
+            prob_out *= self.get_conditional_probability(cond_input_values, cond_evidents)
 
         # Return join probability
+        return prob_out
+
 
     def get_conditional_probability(self, values: dict[str, str], evidents: dict[str, str]) -> float:
         """ returns the conditional probability.
@@ -234,8 +272,9 @@ class BayesianNetwork(object):
 
         # when we want probability of children given their parents
         # if self.varsMap[list(values.keys())[0]].is_child_of(self.varsMap[list(evidents.keys())[0]]):
-        # TODO: Make the shit below readable
-        if all(self.varsMap[list(values.keys())[0]].is_child_of(self.varsMap[evident]) for evident in evidents.keys()):
+        first_val = list(values.keys())[0]
+        first_variable = self.varsMap[first_val]
+        if all(first_variable.is_child_of(self.varsMap[evident]) for evident in evidents.keys()):
             # print('probability of children given their parents')
             for child, c_val in values.items():
                 res *= self.varsMap[child].get_conditional_probability(c_val, evidents)
@@ -396,8 +435,9 @@ def sprinkler() -> None:
 
     print('')
 
-    # sample = create_random_sample(network)
-    # print_joint_probability(network, sample)
+    sample = create_random_sample(network)
+    print_joint_probability(network, sample)
 
 
-sprinkler()
+if __name__ == '__main__':
+    sprinkler()
