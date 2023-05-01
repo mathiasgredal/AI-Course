@@ -5,7 +5,6 @@ import random
 from pprint import pformat
 
 
-
 def multiply_vector_elements(vector):
     """ return the multiplication of the vector elements """
 
@@ -224,6 +223,8 @@ class BayesianNetwork(object):
             self.varsMap[var.name] = var
         self.ready = False  # we need to re-calculate marginals
 
+        self.calculate_marginal_probabilities()
+
     def get_marginal_probability(self, var: Variable, val: str) -> float:
         """ returns the marginal probability of a given node """
 
@@ -258,7 +259,6 @@ class BayesianNetwork(object):
 
         # Return join probability
         return prob_out
-
 
     def get_conditional_probability(self, values: dict[str, str], evidents: dict[str, str]) -> float:
         """ returns the conditional probability.
@@ -368,6 +368,7 @@ def print_conditional_probability(network: BayesianNetwork, conditionals_vars: d
             conditionals_vars,
             conditionals_evidents
         )))
+    print()
 
 
 def print_joint_probability(network: BayesianNetwork, values: dict[str, str]) -> None:
@@ -387,57 +388,82 @@ def print_marginal_probabilities(network: BayesianNetwork) -> None:
             )
 
 
-def sprinkler() -> None:
+def tire():
     # the values kept as dictionary
-    t1 = {(): (0.5, 0.5)}
-    t2 = {('false',): (0.5, 0.5), ('true',): (0.9, 0.1)}
-    t3 = {('false',): (0.8, 0.2), ('true',): (0.2, 0.8)}
-    t4 = {
-        ('false', 'false'): (1, 0),
-        ('true', 'false'): (0.1, 0.9),
-        ('false', 'true'): (0.1, 0.9),
-        ('true', 'true'): (0.01, 0.99)
+
+    # False first!!
+
+    # Damaged tire
+    DT = {(): (0.7, 0.3)}
+    # Electronics malfunctioning
+    EM = {(): (0.7, 0.3)}
+    # Fuel tank leaking
+    FTL = {(): (0.8, 0.2)}
+    # Slow max speed
+    SMS = {
+        ('true', 'true'): (0.95, 0.05),
+        ('true', 'false'): (0.4, 0.6),
+        ('false', 'true'): (0.7, 0.3),
+        ('false', 'false'): (0.3, 0.7)
     }
+    # High fuel consumption
+    HC = {
+        ('true', 'true', 'true'): (0.1, 0.9),
+        ('true', 'true', 'false'): (0.2, 0.8),
+        ('true', 'false', 'true'): (0.7, 0.3),
+        ('true', 'false', 'false'): (0.8, 0.2),
+        ('false', 'true', 'true'): (0.4, 0.6),
+        ('false', 'true', 'false'): (0.5, 0.5),
+        ('false', 'false', 'true'): (0.9, 0.1),
+        ('false', 'false', 'false'): (0.99, 0.01),
+    }
+    V = {('true',): (0.3, 0.7), ('false',): (0.9, 0.1)}
+    # Vibrations
 
     # creation of Nodes objects
-    cloudy = Variable('Cloudy', ('false', 'true'), t1)
-    sprinkler = Variable('Sprinkler', ('false', 'true'), t2, [cloudy])
-    rain = Variable('Rain', ('false', 'true'), t3, [cloudy])
-    wetgrass = Variable('WetGrass', ('false', 'true'), t4, [sprinkler, rain])
+    Damaged_tire = Variable('DT', ('false', 'true'), DT)
+    Electronic_malfunction = Variable('EM', ('false', 'true'), EM)
+    Fuel_leak = Variable('FTL', ('false', 'true'), FTL)
+    Vibrations = Variable('V', ('false', 'true'), V, [Damaged_tire])
+    Slow_max_speed = Variable('SMS', ('false', 'true'), SMS, [Damaged_tire, Electronic_malfunction])
+    High_consumption = Variable('HC', ('false', 'true'), HC, [Damaged_tire, Electronic_malfunction, Fuel_leak])
 
-    variables = [cloudy, sprinkler, rain, wetgrass]
+    variables = [Damaged_tire, Electronic_malfunction, Fuel_leak, Vibrations, Slow_max_speed, High_consumption]
 
     # creation of Network
     network = BayesianNetwork()
     network.set_variables(variables)
 
     # pre-calculate marginals
-    network.calculate_marginal_probabilities()
+    # network.calculate_marginal_probabilities()
 
     print_marginal_probabilities(network)
 
     print('')
 
     joint_values = {
-        'Sprinkler': 'true',
-        'Cloudy': 'false',
-        'WetGrass': 'true',
-        'Rain': 'false'
+        'DT': 'true',
+        'EM': 'false',
+        'FTL': 'true',
+        'V': 'false',
+        'SMS': 'false',
+        'HC': 'false'
     }
     print_joint_probability(network, joint_values)
 
     print('')
+    # These have been retrieved from the description of the vehicle problems:
+    conditionals_evidents = {
+        'V': 'true',  # You have noticed that there are vibrations while driving,
+        'SMS': 'true',  # and it is difficult to reach the top speed.
+        'HC': 'false'  # Your car does not consume more than usual.
+    }
 
-    conditionals_vars = {'Sprinkler': 'true'}
-    conditionals_evidents = {'WetGrass': 'true'}
-
-    print_conditional_probability(network, conditionals_vars, conditionals_evidents)
-
-    print('')
-
-    sample = create_random_sample(network)
-    print_joint_probability(network, sample)
+    print_conditional_probability(network, {'DT': 'true', }, conditionals_evidents)
+    print_conditional_probability(network, {'EM': 'true', }, conditionals_evidents)
+    print_conditional_probability(network, {'FTL': 'true', }, conditionals_evidents)
 
 
 if __name__ == '__main__':
-    sprinkler()
+    # sprinkler()
+    tire()
